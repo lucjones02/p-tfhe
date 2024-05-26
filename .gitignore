@@ -3,4 +3,5 @@ venv/
 results_dump/
 .cache/
 figs/
+keep_results/
 *.py
