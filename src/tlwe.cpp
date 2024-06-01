@@ -1,4 +1,3 @@
-
 #include <cmath>
 #include <iostream>
 
@@ -123,4 +122,94 @@ t32 TLWESample::operator[](int i) const
 t32& TLWESample::operator[](int i)
 {
     return a[i];
+}
+
+ModdedTLWESample::ModdedTLWESample(const Bitmap& s, s_int sk_num):
+    is_encrypted(false),
+    secret_key_num(sk_num)
+{
+    Generator* gen = Generator::get_instance();
+    t32 sa = 0; // s.a running sum of secret times by samples for the last entry of the sample
+    uint8_t mu_overflow = 0; // start counting the overflows for mu
+    // for(int i=0; i<10; i++){
+    for(int i=0; i<k_dim; i++){
+        t32 ai = gen->sample_torus(); // current sample at index i
+        a.push_back(ai);
+        overflows.push_back(0);
+        if(overflowed(sa, (s[i]*ai))){
+            mu_overflow++;
+        }
+        sa += s[i]*ai; // add value of the secret at index i time the sample at index i (s[i] is 0 or 1)
+    }
+    t32 e = gen->sample_error(); // error of the sample
+    if((int)e > 0){
+        if(overflowed(sa, e)){
+            mu_overflow++;
+        }
+    }
+    // std::cout << "error " << (int)e << std::endl;
+    a.push_back(sa + e); // index k_dim | math equivalent: index (k+1)
+    overflows.push_back(mu_overflow);
+}
+
+ModdedTLWESample::ModdedTLWESample(ModdedTLWESample* s):
+    is_encrypted(s->is_encrypted),
+    secret_key_num(s->secret_key_num)
+{
+    for(int i=0; i<=k_dim; i++){
+        a.push_back(0);
+        overflows.push_back(0);
+    }
+}
+
+void ModdedTLWESample::encrypt(t32 mu, int p_){
+    p = p_;
+    // std::cout << std::bitset<64>(p*(uint64_t)mu) << std::endl;
+    uint32_t overs = (p*(uint64_t)mu) >> 32; 
+    // std::cout << "overs " << (int)overs << std::endl;
+    overflows[k_dim] += overs;
+    if(is_encrypted){
+        throw std::runtime_error("TLWESample already encrypted");
+    }
+    if(overflowed(a[k_dim], (uint32_t)p*mu)){
+        overflows[k_dim]++;
+    }
+    // std::cout << "encrypted " << (int) (p*mu) << "  "<< std::bitset<32>(p*mu) << std::endl;
+    a[k_dim] += p*mu;
+    is_encrypted = true;
+}
+t32 ModdedTLWESample::operator[](int i) const
+{
+    return a[i];
+}
+
+t32& ModdedTLWESample::operator[](int i)
+{
+    return a[i];
+}
+
+uint32_t ModdedTLWESample::get_overflows(int i)
+{
+    return overflows[i];
+}
+
+int ModdedTLWESample::get_p()
+{
+    return p;
+}
+
+ModdedTLWESample ModdedTLWESample::operator+(ModdedTLWESample const& m)
+{
+    ModdedTLWESample sum(this);
+    assert(secret_key_num == m.secret_key_num);
+
+    for(int i=0; i<=k_dim; i++){
+        sum[i] = a[i] + m.a[i];
+        sum.overflows[i] = overflows[i] + m.overflows[i];
+        if(overflowed(a[i], m.a[i])){
+            sum.overflows[i]++;
+        }
+    }
+
+    return sum;
 }

@@ -31,4 +31,26 @@ public:
     t32& operator[](int i);
 };
 
+class ModdedTLWESample{
+private:
+    std::vector<t32> a;
+    std::vector<uint32_t> overflows;
+    bool is_encrypted;
+    s_int secret_key_num;
+    int p;
+
+    ModdedTLWESample(ModdedTLWESample* s);
+public:
+    ModdedTLWESample(const Bitmap& s, s_int sk_num);
+
+    void encrypt(t32 mu, int p);
+
+    ModdedTLWESample operator+(ModdedTLWESample const& c);
+    t32 operator[](int i) const;
+    t32& operator[](int i);
+    uint32_t get_overflows(int i);
+    int get_p();
+
+};
+
 #endif // !TLWE_HPP

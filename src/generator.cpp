@@ -4,7 +4,7 @@
 #include <common.hpp>
 #include <generator.hpp>
 
-std::default_random_engine generator(std::chrono::steady_clock::now().time_since_epoch().count());
+std::mt19937 generator(std::chrono::steady_clock::now().time_since_epoch().count());
 Generator* Generator::instance = nullptr;
 
 Generator::Generator():num_secret_keys(0){}

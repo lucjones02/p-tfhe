@@ -10,7 +10,7 @@ constexpr int k_dim = 512;
 constexpr int B_gd = 2;
 constexpr int l_gd = 32;
 constexpr int message_space_n = 20;
-constexpr int p = 1 << (message_space_n-1);
+constexpr int p_ms = 1 << (message_space_n-1);
 
 class Bitmap{
     private:
@@ -24,6 +24,13 @@ class Bitmap{
 
 double convert_to_double(t32 mu);
 t32 convert_to_t32(double d);
+
+uint32_t get_inverse_mod(uint32_t p);
+
+inline bool overflowed(uint32_t a, uint32_t b)
+{
+    return ((((a & (0b1 << 31)) == (0b1 << 31)) || ((b & (0b1 << 31)) == (0b1 << 31))) && (((uint32_t)(a+b) & (0b1 << 31)) == 0));
+}
 
 
 #endif // !COMMON_HPP

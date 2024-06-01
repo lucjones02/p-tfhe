@@ -26,3 +26,15 @@ t32 convert_to_t32(double d)
     assert(d <= 1);
     return (t32) (d * std::pow(2, 32));
 }
+
+uint32_t get_inverse_mod(uint32_t p)
+{
+    uint32_t x0 = (3*p)^2;
+    uint32_t y = 1 - p*x0;
+    uint32_t x1 = x0*(1 + y);
+    y *= y;
+    uint32_t x2 = x1*(1 + y);
+    y *= y;
+    uint32_t x3 = x2*(1 + y);
+    return x3;
+}

@@ -19,9 +19,9 @@ int main(){
     // c = c + c;
     // std::cout << std::bitset<32>(abs((int)(mu + mu) - (int)(sas.decrypt(c)))) << std::endl;
     // std::cout << abs((int)(mu + mu) - (int)(sas.decrypt(c)))/2 << std::endl;
-    t32 mu_1 = convert_to_t32(0.125);
+    // t32 mu_1 = convert_to_t32(0.125);
     // t32 mu_2 = 300'000;
-    TLWESample c_1 = sas.encrypt(mu_1);
+    // TLWESample c_1 = sas.encrypt(mu_1);
     // TLWESample c_2 = sas.encrypt(mu_2);
     // std::cout << sas.decrypt(c_1) << "  " << sas.decrypt(c_2) << std::endl;
     // TLWESample c = c_1 + c_1;
@@ -33,9 +33,9 @@ int main(){
     // std::cout << std::bitset<32>(mu_1 * 2 + mu_2 * 5) << " " << std::bitset<32>(mu) << std::endl;
     // std::cout << std::setprecision(17) << (convert_to_double(mu_1) * 2 + convert_to_double(mu_2)* 5) << "  " << convert_to_double(mu) << std::endl;
 
-    c_1.gadget_decomposition();
-    c_1.mult_by_gadget_matrix();
-    std::cout << std::setprecision(17) << convert_to_double(sas.decrypt(c_1)) << std::endl;
+    // c_1.gadget_decomposition();
+    // c_1.mult_by_gadget_matrix();
+    // std::cout << std::setprecision(17) << convert_to_double(sas.decrypt(c_1)) << std::endl;
 
     // std::cout << std::endl;
     // int m = 4;
@@ -54,5 +54,19 @@ int main(){
 
     // std::cout << (res / 10'000.) << std::endl;
     // std::cout << res << std::endl;
+    // 00010001011011000001101100110110
+    // 00010001011011000001101100110110
+    // 00010001011011000001101100110110
 
+    // t32 problem = 0b00000111011101111000000001101001;
+    // ModdedTLWESample test = sas.encrypt(problem, 5231);
+    // t32 resed = sas.decrypt(test);
+    // std::cout << std::bitset<32>(resed) << std::endl;
+    // std::cout << std::bitset<32>(problem)<< std::endl;
+    t32 m_1 = 1;
+    t32 m_2 = 2;
+    ModdedTLWESample c_1  = sas.encrypt(m_1, 5231);
+    ModdedTLWESample c_2  = sas.encrypt(m_2, 5231);
+    t32 res = sas.decrypt(c_1+c_2);
+    std::cout << res << std::endl;
 }

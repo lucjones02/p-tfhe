@@ -16,11 +16,13 @@ public:
     DomainExpansion();
 
     TLWESample encrypt(t32 mu);
+    ModdedTLWESample encrypt(t32 mu, int p);
     TLWESample message_space_encrypt(int m);
     TLWESample message_space_encrypt(t32 mu);
     TGSWSample encrypt(int m);
 
     t32 decrypt(TLWESample c);
+    t32 decrypt(ModdedTLWESample c);
     int message_space_decrypt(TLWESample c);
     int decrypt(TGSWSample C);
 };
