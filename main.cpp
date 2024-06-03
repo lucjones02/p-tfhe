@@ -63,10 +63,11 @@ int main(){
     // t32 resed = sas.decrypt(test);
     // std::cout << std::bitset<32>(resed) << std::endl;
     // std::cout << std::bitset<32>(problem)<< std::endl;
-    t32 m_1 = 1;
-    t32 m_2 = 2;
+    t32 m_1 = 0b1 << 31;
+    t32 m_2 = 0b1 << 30;
     ModdedTLWESample c_1  = sas.encrypt(m_1, 5231);
     ModdedTLWESample c_2  = sas.encrypt(m_2, 5231);
-    t32 res = sas.decrypt(c_1+c_2);
-    std::cout << res << std::endl;
+    // sas.decrypt(c_1);
+    t32 res = sas.decrypt(c_1 + c_2);
+    std::cout << std::bitset<32>(res) << std::endl;
 }

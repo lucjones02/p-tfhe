@@ -36,7 +36,7 @@ Bitmap Generator::get_secret_key(s_int i){
 
 t32 Generator::sample_torus() const
 {
-    std::uniform_int_distribution<uint32_t> u_distribution(0,1<<31);
+    std::uniform_int_distribution<uint32_t> u_distribution(0,UINT32_MAX);
     return u_distribution(generator);
 }
 

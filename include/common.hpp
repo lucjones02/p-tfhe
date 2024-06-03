@@ -27,9 +27,9 @@ t32 convert_to_t32(double d);
 
 uint32_t get_inverse_mod(uint32_t p);
 
-inline bool overflowed(uint32_t a, uint32_t b)
+inline bool addition_overflowed(uint32_t a, uint32_t b)
 {
-    return ((((a & (0b1 << 31)) == (0b1 << 31)) || ((b & (0b1 << 31)) == (0b1 << 31))) && (((uint32_t)(a+b) & (0b1 << 31)) == 0));
+    return (((uint32_t)(a+b) < a)&&((uint32_t)(a+b) < b));
 }
 
 

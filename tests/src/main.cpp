@@ -15,7 +15,8 @@ int main(int argc, char *argv[]){
         // test_torus_sampling();
         // test_torus_zeroes();
         // test_add_correctness_tlwe();
-        test_decode();
+        // test_decode();
+        test_decode_single_add();
     }
     else{
         get_error_precision_single_addition_tlwe();

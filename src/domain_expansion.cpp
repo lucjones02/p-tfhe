@@ -65,25 +65,30 @@ t32 DomainExpansion::decrypt(ModdedTLWESample c)
     uint32_t overflows = 0;
     uint32_t sa_overflow = 0;
 
+#ifdef DEBUG
+    uint64_t control = 0;
+    std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
+#endif
     for(int i=0; i<k_dim; i++){
-        if(overflowed(sa, secret_key[i]*c[i])){
+        if(addition_overflowed(sa, secret_key[i]*c[i])){
             sa_overflow++;
         }
+#ifdef DEBUG
+        control += secret_key[i]*c[i];
+        std::cout << std::bitset<32>(control) << std::endl;
+#endif
         sa += secret_key[i]*c[i];
         overflows += secret_key[i]*c.get_overflows(i);
     }
 
     uint32_t total_overflows = sa_overflow + overflows;
-    if(overflowed((t32)(c[k_dim]-sa), (uint32_t)sa)){
+    if(addition_overflowed((t32)(c[k_dim]-sa), (uint32_t)sa)){
         total_overflows++;
     }
     uint32_t pmu_overflows = c.get_overflows(k_dim) - total_overflows;
     pmu_overflows = pmu_overflows % c.get_p();
-    // std::cout << "pmu overflows  " << (int)pmu_overflows << std::endl;
-    // uint32_t quotient = ((uint64_t)0b1 << 32) / c.get_p();
     uint32_t quotient = ((uint64_t)0b1 << 32) / c.get_p();
     uint32_t modulus = ((uint64_t)0b1 << 32) % c.get_p();
-    // std::cout << "mod " << modulus << std::endl;
     int leeway  = c.get_p() >> 1;
 
     uint32_t min_val = pmu_overflows==0 ? 0 : pmu_overflows * (quotient) * c.get_p() + (modulus*pmu_overflows / c.get_p()) * c.get_p() + c.get_p();
@@ -94,8 +99,6 @@ t32 DomainExpansion::decrypt(ModdedTLWESample c)
     else{
         max_val = min_val + (quotient-1) * c.get_p();
     }
-    // std::cout << "min val " << (min_val) << std::endl;
-    // std::cout << "max val " << (int)max_val << "  " << std::bitset<32>(max_val) << std::endl;
     uint32_t corrected = c[k_dim] - sa - min_val;
     if(c[k_dim]-sa < min_val){
         if((int)(c[k_dim]-sa) < (int)(min_val - leeway)){
@@ -103,19 +106,32 @@ t32 DomainExpansion::decrypt(ModdedTLWESample c)
         }
         return min_val*get_inverse_mod(c.get_p());
     }
-    // std::cout << "pmu " << (int)(c[k_dim] -sa) << "  "<< std::bitset<32>(c[k_dim]-sa) << std::endl;
     uint32_t decode_index = corrected / c.get_p();
-    // std::cout << "decode index " << decode_index << std::endl;
     uint32_t decode_index_mod = corrected % c.get_p();
-    // std::cout << "decode_index_mod " << decode_index_mod << std::endl;
-    // std::cout << "leeway "<< leeway << std::endl;
+#ifdef DEBUG
+    std::cout << "sa overs  " << sa_overflow << std::endl;
+    std::cout << "overflows " << overflows << std::endl;
+    std::cout << "total overs  " << total_overflows << std::endl;
+    std::cout << "pmu overflows  " << (int)pmu_overflows << std::endl;
+    std::cout << "mod " << modulus << std::endl;
+    std::cout << "min val " << (min_val) << std::endl;
+    std::cout << "max val " << (int)max_val << "  " << std::bitset<32>(max_val) << std::endl;
+    std::cout << "pmu " << (int)(c[k_dim] -sa) << "  "<< std::bitset<32>(c[k_dim]-sa) << std::endl;
+    std::cout << "decode index " << decode_index << std::endl;
+    std::cout << "decode_index_mod " << decode_index_mod << std::endl;
+    std::cout << "leeway "<< leeway << std::endl;
+#endif
     if(decode_index_mod > leeway){
-        // std::cout << "decode_index_mod larger" << std::endl;
+#ifdef DEBUG
+        std::cout << "decode_index_mod larger" << std::endl;
+#endif
         decode_index++;
     }
-    // std::cout << std::bitset<32>(c[k_dim]-sa) << std::endl;
-    // std::cout << "intermediate " << std::bitset<32>(decode_index*c.get_p()) << std::endl;
-    // std::cout << std::bitset<32>(min_val + decode_index * c.get_p())<< std::endl;
+#ifdef DEBUG
+    std::cout << std::bitset<32>(c[k_dim]-sa) << std::endl;
+    std::cout << "intermediate " << std::bitset<32>(decode_index*c.get_p()) << std::endl;
+    std::cout << std::bitset<32>(min_val + decode_index * c.get_p())<< std::endl;
+#endif // DEBUG
     return (min_val + decode_index*c.get_p())* get_inverse_mod(c.get_p());
 }
 
